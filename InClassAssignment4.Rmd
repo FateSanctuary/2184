@@ -1,0 +1,63 @@
+---
+title: "In-class Assignment 4"
+author: 'Xinrui Hu (NetID: xh2506)'
+output: pdf_document
+---
+
+```{r, include=FALSE}
+library(tidyverse)
+```
+
+### Question 1 (1 pt): Use `str_length()` and `str_sub()` to extract the middle character from each string in the vector `x <- c("a", "abc", "abcd", "abcde", "abcdef")`. What will you do if a string has an even number of characters? (Hint: Base R function `floor()` or `ceiling()` may be useful here.)
+**Answer:** 
+<!--Provide your answer and code below-->
+```{r}
+x <- c("a", "abc", "abcd", "abcde", "abcdef")
+L <- str_length(x)
+y <- ceiling(L/2)
+str_sub(x,y,y)
+```
+
+
+
+### Question 2 (1 pt): `words` is a vector with each element being a word, which is available after you run `library(tidyverse)`. From the vector `words`, find the words that have the highest number of vowels?
+**Answer:** 
+<!--Provide your answer and code below-->
+```{r}
+vowels <- str_count (words,"[aeiou]")
+words[vowels == max(vowels)]
+```
+
+
+
+### Question 3 (1 pt): `sentences` is a vector with each element being a sentence, which is available after you run `library(tidyverse)`. Extract the first word from each sentence in `sentences`. Use `%>% head(100)` to output the result. 
+**Answer:** 
+<!--Provide your answer and code below-->
+```{r}
+str_extract(sentences, boundary("word")) %>% head(100)
+```
+
+
+
+### Question 4 (1 pt): In the vector `sentences`, find all words that contain an apostrophe. In each found word, separate out the pieces before and after the apostrophe. (Hint: See 14.4.3 Grouped Matches in the textbook.)
+**Answer:** 
+<!--Provide your answer and code below-->
+```{r}
+contraction <-"([A-Za-z]*)'([A-Za-z]*)"
+sentences %>%
+  str_subset(contraction) %>%
+  str_match_all(contraction)
+```
+
+
+
+### Question 5 (1 pt): What are the five most common words in the vector `sentences`? (Hint: You may use `boundary("word")` with an appropriate function. Use the function `unlist()` to convert a list to a vector. The function `count()` may be useful here.)
+**Answer:** 
+<!--Provide your answer and code below-->
+```{r}
+tibble(word = str_to_lower(unlist(str_extract_all(sentences, boundary("word"))))) %>%
+  count(word, sort = TRUE) %>%
+  head(5)
+```
+
+

@@ -1,0 +1,128 @@
+---
+title: "In-class Assignment 5"
+author: 'Xinrui Hu (NetID: xh2506)'
+output: pdf_document
+---
+
+```{r, include=FALSE}
+library(tidyverse)
+```
+
+
+### Question 1 (1 pt): According to the `gss_cat` data from `tidyverse`, how have the proportions of people identifying as Democrat, Republican, Independent and Other changed over time? Provide a `ggplot` graph to show the trend. Use function `fct_collapse()` to collapse the levels of `gss_cat$partyid` into the above 4 levels. Also use function `fct_reorder2()` to make the plot easier to read.
+**Answer:** 
+<!--Provide your answer and code below-->
+```{r}
+levels(gss_cat$partyid)
+gss_cat %>%
+  mutate(
+    partyid = 
+    fct_collapse(partyid, 
+    other = c("No answer", "Don't know", "Other party"),
+    rep = c("Strong republican","Not atr republican"),
+    ind = c("Ind,near rep", "Independent", "Ind,near dem"),
+    dem = c("Not atr democrat", "Strong democrat")
+    )
+) %>% 
+count(year,partyid) %>% 
+group_by(year) %>% 
+mutate(p=n / sum(n)) %>%
+ggplot(aes(
+  x = year,y = p,
+  color = fct_reorder2(partyid, year, p)
+))+
+geom_point()+
+geom_line()+
+labs(color = "Party ID") +
+xlab("year")+
+ylab("Praportion")
+```
+
+
+
+### Question 2 (1 pt): For `x <- c(0, NA, NaN, Inf, -Inf)`, describe the difference between `is.finite(x)` and `!is.infinite(x)`.
+**Answer:** 
+<!--Provide your answer and code below-->
+```{r}
+x<- c(0, NA, NaN, Inf, -Inf)
+is.finite(x)
+!is.infinite(x)
+# is.finite consider the whether the value is finite or not, missing value would be consider as infinite. is.infinite would consider whether the value is infinite or not and the missing value would be consider as finite.
+```
+
+
+
+### Question 3 (1 pt): A vector can be an atomic vector or a list. What happens when you subset with a positive integer that is bigger than the length of a vector? What happens when you subset with a name that does not exist? Provide two examples, one for an atomic vector, and the other for a list. For each example, use two ways, `[]` or `[[]]`, to subset the vector, with an integer or a name in the brackets. Use the option `error = TRUE` for the code chunk in R Markdown if code returns an error.
+**Answer:** 
+<!--Provide your answer and code below-->
+```{r}
+x <- c(a = 10, b = 20)
+x[3]
+```
+```{r, error = TRUE}
+x[[3]]
+```
+```{r}
+x["c"]
+```
+```{r, error = TRUE}
+x[["c"]]
+```
+```{r}
+y <- list(a = 10, b = 20)
+y[3]
+```
+```{r, error = TRUE}
+y[[3]]
+```
+```{r}
+y["c"]
+```
+```{r}
+y[["c"]]
+```
+
+
+
+
+
+### Question 4 (1 pt): Is it OK to have a list as a column of a tibble? Provide an example. First ensure that all columns of your tibble have the same length.
+**Answer:** 
+<!--Provide your answer and code below-->
+```{r}
+data <- tibble(x = 1:3,y = list("a", 1, list(1:3)))
+data
+```
+```{r}
+data$y
+```
+
+
+
+### Question 5 (1 pt): Carefully read the documentation of `is_vector()` at <https://rlang.r-lib.org/reference/type-predicates.html>. What is the difference between the `tidyverse`'s function `is_vector()` and the base R function `is.vector()` when they are applied to an atomic vector? Provide an example to show the difference. 
+**Answer:** 
+<!--Provide your answer and code below-->
+```{r}
+x<- c(a = 1,b = 1)
+attributes(x)
+```
+```{r}
+is_vector(x)
+```
+```{r}
+is.vector(x)
+```
+```{r}
+attr(x, "gomothinge") <- TRUE
+attributes(x)
+```
+```{r}
+is_vector(x)
+```
+```{r}
+is.vector(x)
+```
+
+
+
+

@@ -1,0 +1,102 @@
+---
+title: "Final Project"
+author: "Xinrui Hu (NetID: xh2506)"
+date: "2023-01-24"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# Backgrround
+
+  As we were the victims and bystanders of this worldwide pandemic. The Covid-19 took us a lot not only the years of time. Went through this profound pandemic, I am wondering that how was the virus developed in US and remind me that how many people passed away not only noted on the number of death.
+  In this research I would use two data base from the aspect of nation and states to illustrate the development of virus in US and specify it among the states.
+  The techniques involved in this project are line chart, pie chart, and histogram etc. to help us understand the data imported.
+  The line chart and histogram would helps us to visualize the trend of the target data, pie chart can helps us to find the weight of different variable in the researching data
+
+
+# Package required
+
+```{r, message=FALSE}
+library(tidyr)        # creating tidy data
+library(dplyr)        # transforming data
+library(ggplot2)      # plot data
+library(lubridate)    #optimize the date
+```
+
+# Preparing data
+
+## Loading data
+### The data we use here are "us.csv"(<https://github.com/nytimes/covid-19-data/blob/master/us.csv>), and "us-states.csv"(<https://github.com/nytimes/covid-19-data/blob/master/us-states.csv>)
+```{r}
+State <- read.csv("us-states.csv")
+US <- read.csv("us.csv")
+dim(State) # dimention of data
+dim(US)
+```
+
+## Tidy data
+```{r}
+sum(is.na(State))
+sum(is.na(US))
+```
+```{r}
+US$date <- ymd(US$date)
+US$date <- format(US$date, "%y-%m") # transform the time range from date to month.
+US_month <- US %>%
+  group_by(date) %>%
+  summarize(case = max(cases), death = max(deaths)) %>%
+  ungroup() # simplify the data with total case and death at the end of the month
+```
+```{r, message=FALSE}
+State$date <- ymd(State$date)
+State$date <- format(State$date, "%y-%m")
+State_month <- State %>%
+  select(-fips) %>% 
+  group_by(date,state) %>%
+  summarize(case = max(cases), death = max(deaths)) %>% 
+  ungroup()
+State_month <- State_month %>% filter(date != "20-01" & date != "20-02" & date != "23-01")
+
+# The data of these two month in 2020 were vacant in most states, the date in of Jan. in 2023 is fewer.
+```
+
+# Data Analysis
+
+## Nation Level
+```{r}
+ggplot(US_month, aes(x = date, y = case, color = "case")) + 
+  geom_point() + 
+  ggtitle("Counts of case over time") +
+  xlab("Date") +
+  ylab("Count") # The case development was roar 2021
+```
+
+```{r}
+ggplot(US_month, aes(x = date, y = death, color = "death")) + 
+  geom_point() + 
+  ggtitle("Counts of death over time") +
+  xlab("Date") +
+  ylab("Count") # The death number is alike the graph of case
+```
+
+## States Level
+```{r, message=FALSE}
+State_month$date <- ymd(State_month$date)
+State_month$date <- format(State_month$date, "%y")
+State_month <- State_month %>%
+  group_by(date,state) %>%
+  summarize(case = max(case), death = max(death)) %>% 
+  ungroup()
+```
+
+```{r}
+ggplot(State_month, aes(x = date, y = death, color = state)) + 
+  geom_point() + 
+  ggtitle("Counts of death over time") +
+  xlab("Date") +
+  ylab("Count")
+```
+
+

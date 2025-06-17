@@ -1,0 +1,83 @@
+---
+title: "In-class Assignment 6"
+author: 'Xinrui Hu (NetID: xh2506)'
+output: pdf_document
+---
+
+```{r, include=FALSE}
+library(tidyverse)
+```
+
+### Question 1 (1 pt): Write your own function to compute the variance of a numeric vector. Then use your function to compute the variance of `1:100`.
+**Answer:** 
+```{r}
+myfun <- function(x) {
+  n <- length(x)
+  y <- sum((x-mean(x))^2)/(n-1)
+  y
+}
+myfun(1:100)
+```
+
+
+
+### Question 2 (1 pt): Write a `fizzbuzz` function. It takes a single number as input. If the number is divisible by three, it returns `"fizz"`. If it’s divisible by five it returns `"buzz"`. If it’s divisible by three and five, it returns `"fizzbuzz"`. Otherwise, it returns the number. Output the results of `fizzbuzz(6)`, `fizzbuzz(10)`, `fizzbuzz(15)` and `fizzbuzz(2)`.
+**Answer:** 
+```{r}
+
+fizzbuzz <- function(f) {
+  if ((f/5) == round(f/5) & (f/3) == round(f/3)){
+      "fizzbuzz"
+    }else if ((f/5) == round(f/5)){
+      "buzz"
+    }else if ((f/3) == round(f/3)){
+    "fizz"
+      }else{
+        f}
+  }
+fizzbuzz(6)
+fizzbuzz(10)
+fizzbuzz(15)
+fizzbuzz(2)
+```
+
+
+
+### Question 3 (1 pt): Carefully read the documentation of the base R function `cut()`. Modify the following `cold_hot` function by using `cut()` to simplify the set of nested if-else statements. After the modification, output the results of `cold_hot(-5)`, `cold_hot(0)`, `cold_hot(10)`, `cold_hot(20)` and `cold_hot(30)`.
+```{r}
+cold_hot <- function(temp){
+  cut(temp, c(-Inf, 0, 10, 20, 30, Inf),
+      right = FALSE,
+      labels = c("freezing", "cold", "cool", "warm", "hot"))
+}
+
+cold_hot(-5)
+cold_hot(0)
+cold_hot(10)
+cold_hot(20)
+cold_hot(30)
+```
+**Answer:** 
+
+
+
+### Question 4 (1 pt): A function called `commas()` is defined below. What does `commas(letters, collapse = "-")` do? Why? (If there is an error when knitting, use the code chunk option `error = TRUE`.)
+```{r,error = TRUE}
+commas <- function(...) {
+  str_c(..., collapse = ", ")
+}
+commas(letters, collapse = "-")
+```
+**Answer:** 
+```{r}
+# Because it add a argument to the function which would gives an error
+```
+
+
+
+### Question 5 (1 pt): Carefully read the documentation of the function `cor()` of package `stats`. The default value for the `method` argument to `cor()` is `c("pearson", "kendall", "spearman")`. What does that mean? What value is used by default?
+**Answer:** 
+```{r}
+# It means method argument can take one of those three values, the pearson is used by default.
+```
+

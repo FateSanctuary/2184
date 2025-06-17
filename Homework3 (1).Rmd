@@ -1,0 +1,82 @@
+---
+title: "Homework 3"
+author: 'Xinrui Hu (NetID: xh2506)'
+output: pdf_document
+---
+
+```{r load_packages, include=FALSE}
+library(tidyverse)
+library(dslabs)
+```
+
+**You are required to process the data `us_contagious_diseases` (available from package `dslabs`) via the 5 sequential steps given in the questions below.**
+
+### Question 1 (2 pts): From the data `us_contagious_diseases`, ignoring the variable `weeks_reporting`, compute the yearly incidence rate of each disease for the entire country. Store the result into a new data frame, named as `US_incidence`, with columns `disease`, `year`, and `incidence_per_millon` (i.e., the yearly incidence rate times one million). Provide the output of `head(US_incidence)` and `dim(US_incidence)`. Note that you need to drop the missing values (`NA`) of `us_contagious_diseases` after deleting the variable `weeks_reporting`. 
+**Answer:** 
+```{r}
+data("us_contagious_diseases")
+US_incidence <- us_contagious_diseases %>%
+  select(-weeks_reporting) %>% 
+  drop_na() %>%
+  group_by(disease, year) %>%
+  summarize(incidence_per_millon = sum(count)/sum(population)*1e6) %>%
+  ungroup()
+head(US_incidence)
+```
+```{r}
+dim(US_incidence)
+```
+
+
+### Question 2 (2 pts): Pivot the data frame `US_incidence` into a new one that shows the `incidence_per_millon` values for all diseases of the same year at the same row. Still use  the name `US_incidence` for the new data frame. Then provide the output of `head(US_incidence)` and `dim(US_incidence)`. Note that the output of `head(US_incidence)` should look like as follows:
+**Answer:** 
+```{r}
+US_incidence <- US_incidence %>%
+  pivot_wider(id_cols = year, names_from = disease, values_from = incidence_per_millon)
+head(US_incidence)
+```
+```{r}
+dim(US_incidence)
+```
+
+
+
+### Question 3 (2 pts): Carefully read the documentation of the function `cor()` of package `stats`. According to the new data frame `US_incidence` from Question 2, compute the Pearson's correlation between `Hepatitis A` and `Measles` in terms of `incidence_per_millon`. Due to missing values, you need to choose an appropriate value for the `use` argument in `cor()`.
+**Answer:** 
+```{r}
+cor(US_incidence$`Hepatitis A`, US_incidence$Measles, use = "pairwise.complete.obs", method = "pearson")
+```
+
+
+### Question 4 (2 pts): According to the new data frame `US_incidence` from Question 2, use one of the `map` functions to compute the Pearson's correlation between `Hepatitis A` and each of the other 6 diseases in terms of `incidence_per_millon`, and return a `double` vector as the output.
+**Answer:** 
+```{r}
+cor_vec <- map_dbl(colnames(US_incidence)[-c(1,2)], ~ cor(US_incidence$'Hepatitis A', US_incidence[, .x], use = "pairwise.complete.obs"), method = "pearson")
+rbind(names(US_incidence)[3:8], cor_vec)
+```
+
+
+
+
+### Question 5 (2 pts): According to the new data frame `US_incidence` from Question 2, for each of the 7 diseases, find its most positively (Pearson's) correlated disease (except itself) and corresponding correlation. Simplify your code by loops or the `map` functions. 
+**Answer:** 
+```{r}
+library(purrr)
+cor_matrix <- cor(US_incidence, use = "pairwise.complete.obs")
+diag(cor_matrix) <- NA
+most_correlated_disease <- map(colnames(US_incidence), function(disease) {
+  disease_cor <- cor_matrix[disease,]
+  max_cor_index <- which.max(disease_cor)
+  c(colnames(US_incidence)[max_cor_index], disease_cor[max_cor_index])
+  })
+most_correlated_disease
+```
+
+```{r}
+df <- US_incidence[,-1]
+cor_matrix <- cor(df, use = "pairwise.complete.obs")
+cor_matrix
+```
+
+
+
